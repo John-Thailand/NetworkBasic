@@ -13,6 +13,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        /*
         // 指定されたアドレスにアクセス
         val url = URL("https://wings.msn.to/")
         val con = url.openConnection() as HttpURLConnection
@@ -26,19 +27,22 @@ class MainActivity : AppCompatActivity() {
         // 読み込んだテキストをTextViewに反映
         val txtResult = findViewById<TextView>(R.id.txtResult)
         txtResult.text = builder.toString()
+         */
 
-        /*
-        val url = URL("https://wings.msn.to/")
-        val con = url.openConnection() as HttpURLConnection
-        con.requestMethod = "GET"
-        val reader = con.inputStream.bufferedReader()
-        val builder = StringBuilder()
-        reader.forEachLine {
-            builder.append(it)
+        val result = StringBuilder()
+        // 別スレッドでネットワークアクセスを実行
+        Executors.newSingleThreadExecutor().execute {
+            val url = URL("https://wings.msn.to/")
+            val con = url.openConnection() as HttpURLConnection
+            con.requestMethod = "GET"
+            val reader = con.inputStream.bufferedReader()
+            reader.forEachLine {
+                result.append(it)
+            }
+            // 処理結果をHandler経由でUIに反映
+            HandlerCompat.createAsync(mainLooper).post {
+                findViewById<TextView>(R.id.txtResult).text = result.toString()
+            }
         }
-        val txtResult = findViewById<TextView>(R.id.txtResult)
-        txtResult.text = builder.toString()
-        */
-
     }
 }
